@@ -29,14 +29,6 @@ local char     = Player.Character or Player.CharacterAdded:Wait()
 local hrp      = char:WaitForChild("HumanoidRootPart")
 local humanoid = char:WaitForChild("Humanoid")
 
-----------------------------------------------------------------
---  CoreGui komplett ausblenden                                --
-----------------------------------------------------------------
-for _, guiType in ipairs(Enum.CoreGuiType:GetEnumItems()) do
-    pcall(function() StarterGui:SetCoreGuiEnabled(guiType, false) end)
-end
-
-
 --// Remotes ---------------------------------------------------
 local ActivateRemote    = Replicated:WaitForChild("Packages")
                                      :WaitForChild("RemotePromise")
@@ -141,10 +133,10 @@ local function createOverlay()
     estimatedLabel = makeLabel("EstimatedLabel","Estimated Bonds/hr: 0",  20)
 
     discordBtn = Instance.new("TextButton", container)
-    discordBtn.Name     = "DiscordButton"
-    discordBtn.Size     = UDim2.new(1,0,0,36)
-    discordBtn.Font     = Enum.Font.GothamBold
-    discordBtn.TextSize = 20
+    discordBtn.Name       = "DiscordButton"
+    discordBtn.Size       = UDim2.new(1,0,0,36)
+    discordBtn.Font       = Enum.Font.GothamBold
+    discordBtn.TextSize   = 20
     discordBtn.TextColor3 = Color3.fromRGB(255,255,255)
     discordBtn.Text       = "discord.gg/KQMzeSpNbY"
     local btnGrad = Instance.new("UIGradient", discordBtn)
@@ -192,8 +184,8 @@ createOverlay()
 ---------------------------------------------------------------
 --  Overlay‑Helper‑Funktionen                                 --
 ---------------------------------------------------------------
-local function setStatus(t) if statusLabel    then statusLabel.Text    = "Status: "..t end end
-local function setFound(n)   if foundLabel     then foundLabel.Text     = "Bonds found: "..n end end
+local function setStatus(t)    if statusLabel    then statusLabel.Text    = "Status: "..t end end
+local function setFound(n)     if foundLabel     then foundLabel.Text     = "Bonds found: "..n end end
 local function setCollected(n)
     if collectedLabel then
         collectedLabel.Text = "Bonds collected: "..n
@@ -246,27 +238,11 @@ for i = 1, steps do
 end
 hrp.CFrame = scanTarget
 task.wait(pauseScan); recordBonds(); task.wait(extraWait)
--- Warte, bis keine neuen Bonds mehr gefunden werden
 repeat
     local before = #bondData
     recordBonds()
-    task.wait(0.1)
+    task.wait(0.3)
 until #bondData == before
-
-
--- Fügt diese Funktion ein, um während des Sitzens ständig die Position zu synchronisieren
-local RunService = game:GetService("RunService")
-
-local function enableSeatSync()
-    -- Wenn der Spieler sitzt, wird jede Heartbeat aktualisiert
-    RunService.Heartbeat:Connect(function()
-        local seatPart = humanoid.SeatPart
-        if seatPart then
-            -- Setze HumanoidRootPart exakt auf die Sitz‑Position, um Ruckeln zu verhindern
-            hrp.CFrame = seatPart.CFrame
-        end
-    end)
-end
 
 ---------------------------------------------------------------
 --  Teleport zur MaximGun                                     --
@@ -286,7 +262,7 @@ do
     clone.Parent   = Workspace
     clone.Anchored = true
     clone.CFrame   = seat.CFrame
-    task.wait(0.1)
+    task.wait(1)
     hrp.CFrame     = clone.CFrame
     clone:Destroy()
 end
@@ -302,23 +278,18 @@ weld.Parent = hrp
 
 -- Noclip aktivieren, damit Sitz und Spieler nicht mehr mit dem Boden kollidieren
 local function enableNoclip(character, seat)
-    -- Sitz nicht mehr kollidierbar
     if seat:IsA("BasePart") then
         seat.CanCollide = false
     end
-    -- Alle Teile des Charakters nicht mehr kollidierbar
     for _, part in ipairs(character:GetDescendants()) do
         if part:IsA("BasePart") then
             part.CanCollide = false
         end
     end
 end
-
--- Direkt nach dem Weld
 enableNoclip(char, seat)
 
-
-task.wait(0.2)
+task.wait(1)
 
 -- Initialer Air‑Teleport 50 Studs hoch, 2 Sekunden halten
 seat.CFrame = seat.CFrame + Vector3.new(0,50,0)
@@ -337,7 +308,7 @@ task.spawn(function()
                 anyNew = true
                 -- Teleport zum Bond
                 seat.CFrame = CFrame.new(entry.pos)
-                task.wait(0.7)
+                task.wait(1)
                 -- Einsammeln
                 if (hrp.Position - entry.pos).Magnitude <= 15 then
                     ActivateRemote:FireServer(entry.item)
@@ -365,7 +336,6 @@ task.spawn(function()
     local rt = Replicated:WaitForChild("ReturnTime")
     rt:GetPropertyChangedSignal("Value"):Wait()
     EndDecisionRemote:FireServer(false)
-
 
     -- Auto‑Continue nach Server‑Hop
     if queue_on_tp then
