@@ -300,6 +300,24 @@ weld.Part0  = hrp
 weld.Part1  = seat
 weld.Parent = hrp
 
+-- Noclip aktivieren, damit Sitz und Spieler nicht mehr mit dem Boden kollidieren
+local function enableNoclip(character, seat)
+    -- Sitz nicht mehr kollidierbar
+    if seat:IsA("BasePart") then
+        seat.CanCollide = false
+    end
+    -- Alle Teile des Charakters nicht mehr kollidierbar
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+end
+
+-- Direkt nach dem Weld
+enableNoclip(char, seat)
+
+
 task.wait(0.2)
 
 -- Initialer Air‑Teleport 50 Studs hoch, 2 Sekunden halten
